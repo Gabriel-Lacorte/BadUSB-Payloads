@@ -8,6 +8,7 @@ REM
 REM -- MimiDuck
 REM -- OS: Windows
 REM -- Version: 1.1
+REM -- Execution time: 35s
 REM
 REM -- Payload to disable windows defender protection and dump windows passwords with mimikatz.
 REM
